@@ -27,7 +27,9 @@ const controller = {
 
     await messageService.update(id, message);
 
-    res.send(this.getById(id));
+    const updatedMessage = await messageService.getById(id);
+
+    res.send(updatedMessage);
   },
 };
 

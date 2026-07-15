@@ -55,7 +55,7 @@ const services = {
     return message;
   },
   update: async (id, message) => {
-    await Message.update({ message }, { where: id });
+    await Message.update({ message }, { where: { id } });
   },
 };
 
