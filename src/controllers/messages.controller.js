@@ -1,4 +1,4 @@
-const { services: messageService } = require('../services/messages.service');
+const { services: messageService } = require('../models/messages.model');
 
 const controller = {
   getAll: async (req, res) => {
@@ -30,6 +30,11 @@ const controller = {
     const updatedMessage = await messageService.getById(id);
 
     res.send(updatedMessage);
+  },
+  getAllByRoomId: async (req, res) => {
+    const roomMessages = await messageService.getAllByRoomId(req.params.roomId);
+
+    res.send(roomMessages);
   },
 };
 

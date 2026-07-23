@@ -2,17 +2,20 @@ const express = require('express');
 const {
   controller: messageController,
 } = require('../controllers/messages.controller');
+const { catchError } = require('../utils/catchError');
 
 const router = express.Router();
 
-router.get('/', messageController.getAll);
+router.get('/', catchError(messageController.getAll));
 
-router.get('/:id', messageController.getById);
+router.get('/:id', catchError(messageController.getById));
 
-router.post('/', messageController.create);
+router.post('/', catchError(messageController.create));
 
-router.delete('/:id', messageController.delete);
+router.delete('/:id', catchError(messageController.delete));
 
-router.patch('/:id', messageController.update);
+router.patch('/:id', catchError(messageController.update));
+
+router.get('/room/:roomId', catchError(messageController.getAllByRoomId));
 
 module.exports = { router };

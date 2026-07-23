@@ -1,4 +1,4 @@
-const { services: userService } = require('../services/users.service');
+const { services: userService } = require('../models/users.model');
 
 const controller = {
   getAll: async (req, res) => {

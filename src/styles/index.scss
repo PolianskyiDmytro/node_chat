@@ -3,9 +3,10 @@ iframe {
 }
 
 body {
-  min-width: 230px;
-  max-width: 550px;
-  margin: 0 auto;
+  min-width: 300px;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
 }
 
 .notification {
@@ -20,6 +21,8 @@ body {
   pointer-events: none;
 }
 
-@import "./todoapp";
-@import "./todo";
-@import "./filter";
+@import './todoapp';
+@import './todo';
+@import './room.scss';
+@import './messages.scss';
+@import './filter';

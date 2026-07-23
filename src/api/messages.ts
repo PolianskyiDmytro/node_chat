@@ -1,7 +1,5 @@
 import { Message } from '../types/Message';
-import { client } from '../utils/fetchClient';
-
-export const USER_ID = 3589;
+import { client } from '../http/fetchClient';
 
 export const getMessages = () => {
   return client.get<Message[]>(`/messages`);
@@ -11,9 +9,10 @@ export const getMessageById = (id: string) => {
   return client.get<Message>(`/messages/${id}`);
 };
 
-export const addMessage = (message: string) => {
+export const addMessage = (message: string, roomId: string) => {
   return client.post<Message>('/messages', {
     message,
+    roomId,
   });
 };
 
@@ -23,4 +22,8 @@ export const deleteMessage = (id: string) => {
 
 export const updateMessage = (id: string, message: string) => {
   return client.patch<Message>(`/messages/${id}`, { message });
+};
+
+export const getAllByRoomId = (roomId: string) => {
+  return client.get<Message[]>(`/messages/room/${roomId}`);
 };

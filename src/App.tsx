@@ -1,170 +1,110 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  getMessages,
-  addMessage,
-  deleteMessage,
-  updateMessage,
-} from './api/messages';
-import { Message } from './types/Message';
-import { MessageElement } from './components/MessageElement/MessageElement';
-import { NewMessage } from './components/NewMessage';
-import { Error } from './components/Error';
-import { ErrorType } from './types/ErrorType';
+import React, { useContext, useEffect } from 'react';
+import { Routes, Route, Link, useNavigate, NavLink } from 'react-router-dom';
 
-export const App: React.FC = () => {
-  const messagesContainerRef = useRef<HTMLElement | null>(null);
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import './styles.scss';
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<ErrorType>(
-    ErrorType.NoError,
-  );
-  const [editedMessage, setEditedMessage] = useState<string>('');
-  const [editedMessageId, setEditedMessageId] = useState<string | null>(null);
+import { AccountActivationPage } from './pages/AccountActivationPage';
+import { AuthContext } from './components/AuthContext';
+import { LoginPage } from './pages/LoginPage';
+import { RegistrationPage } from './pages/RegistrationPage';
+import { RequireAuth } from './components/RequireAuth';
+import { Loader } from './components/Loader.jsx';
+import { HomePage } from './pages/HomePage.jsx';
+import { usePageError } from './hooks/usePageError.js';
+import { ChatPage } from './pages/ChatPage';
 
-  const scrollToBottom = () => {
-    const container = messagesContainerRef.current;
-
-    if (!container) {
-      return;
-    }
-
-    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-  };
-
-  const timerId = useRef(0);
-
-  const hideError = () => {
-    if (timerId.current) {
-      clearTimeout(timerId.current);
-    }
-
-    timerId.current = window.setTimeout(() => {
-      setErrorMessage(ErrorType.NoError);
-    }, 3000);
-  };
-
-  const handleNewMessageChange = (newMessage: string) => {
-    setNewMessage(newMessage);
-  };
-
-  const handleNewMessageSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!newMessage.trim()) {
-      return;
-    }
-
-    setLoading(true);
-
-    addMessage(newMessage)
-      .then((message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
-        setNewMessage('');
-        scrollToBottom();
-      })
-      .catch((error) => {
-        console.error('Error adding message:', error);
-        setErrorMessage(ErrorType.AddMessageError);
-        hideError();
-      })
-      .finally(() => {
-        setLoading(false);
-        setEditedMessageId(null);
-      });
-  };
-
-  const handleDeleteMessage = (id: string) => {
-    deleteMessage(id)
-      .then(() => {
-        setMessages((prevMessages) =>
-          prevMessages.filter((msg) => msg.id !== id),
-        );
-      })
-      .catch((error) => {
-        console.error('Error deleting message:', error);
-      });
-  };
-
-  const handleUpdateMessage = (id: string, message: string) => {
-    if (!id) {
-      return;
-    }
-
-    setLoading(true);
-
-    updateMessage(id, message)
-      .then((updatedMessage) => {
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) => (msg.id === id ? updatedMessage : msg)),
-        );
-        setEditedMessage('');
-        setEditedMessageId(null);
-      })
-      .catch((error) => {
-        console.error('Error updating message:', error);
-        setErrorMessage(ErrorType.UpdateMessageError);
-        hideError();
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+function App() {
+  const navigate = useNavigate();
+  const [error, setError] = usePageError('');
+  const { isChecked, currentUser, logout, checkAuth } = useContext(AuthContext);
 
   useEffect(() => {
-    setLoading(true);
-
-    getMessages()
-      .then(setMessages)
-      .catch((error) => {
-        console.error('Error loading messages:', error);
-        setErrorMessage(ErrorType.LoadMessagesError);
-        hideError();
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
-    setTimeout(() => {
-      scrollToBottom();
-    }, 500);
+    checkAuth();
   }, []);
 
-  return (
-    <div className="todoapp">
-      <h1 className="todoapp__title">Chat</h1>
+  if (!isChecked) {
+    return <Loader />;
+  }
 
-      <div className="todoapp__content">
-        <section ref={messagesContainerRef} className="todoapp__main">
-          {messages.map((message) => (
-            <MessageElement
-              key={message.id}
-              message={message}
-              loading={loading}
-              onDelete={handleDeleteMessage}
-              editedMessage={editedMessage}
-              setEditedMessage={setEditedMessage}
-              editedMessageId={editedMessageId}
-              setEditedMessageId={setEditedMessageId}
-              onUpdate={handleUpdateMessage}
+  return (
+    <>
+      <nav
+        className="navbar has-shadow"
+        role="navigation"
+        aria-label="main navigation"
+      >
+        <div className="navbar-start">
+          <NavLink to="/" className="navbar-item">
+            Home
+          </NavLink>
+
+          <NavLink to="/users" className="navbar-item">
+            Chat
+          </NavLink>
+        </div>
+
+        <div className="navbar-end">
+          <div className="navbar-item">
+            <div className="buttons">
+              {currentUser ? (
+                <button
+                  className="button is-light has-text-weight-bold"
+                  onClick={() => {
+                    logout()
+                      .then(() => {
+                        navigate('/');
+                      })
+                      .catch((err) => {
+                        setError(err.response?.data?.message);
+                      });
+                  }}
+                >
+                  Log out
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/sign-up"
+                    className="button is-light has-text-weight-bold"
+                  >
+                    Sign up
+                  </Link>
+
+                  <Link
+                    to="/login"
+                    className="button is-success has-text-weight-bold"
+                  >
+                    Log in
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main>
+        <section className="section">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="sign-up" element={<RegistrationPage />} />
+            <Route
+              path="activate/:activationToken"
+              element={<AccountActivationPage />}
             />
-          ))}
+            <Route path="login" element={<LoginPage />} />
+
+            <Route path="/" element={<RequireAuth />}>
+              <Route path="users" element={<ChatPage />} />
+            </Route>
+          </Routes>
         </section>
 
-        <NewMessage
-          newMessage={newMessage}
-          onMessageSubmit={handleNewMessageSubmit}
-          onMessageChange={handleNewMessageChange}
-          loading={loading}
-        />
-        <Error
-          errorMessage={errorMessage}
-          onRemoveError={() => setErrorMessage(ErrorType.NoError)}
-        />
-      </div>
-    </div>
+        {error && <p className="notification is-danger is-light">{error}</p>}
+      </main>
+    </>
   );
-};
+}
+
+export default App;

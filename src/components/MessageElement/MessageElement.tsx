@@ -1,10 +1,10 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { Message } from '../../types/Message';
 import classNames from 'classnames';
-import { deleteMessage } from '../../api/messages';
+import { AuthContext } from '../AuthContext';
 
 interface Props {
   message: Message;
@@ -14,7 +14,8 @@ interface Props {
   setEditedMessage: (message: string) => void;
   editedMessageId: string | null;
   setEditedMessageId: (id: string | null) => void;
-  onUpdate: (id: string, message: string) => void;
+  onUpdate: () => void;
+  newMessageFocus: () => void;
 }
 
 export const MessageElement: React.FC<Props> = ({
@@ -26,7 +27,9 @@ export const MessageElement: React.FC<Props> = ({
   editedMessageId,
   setEditedMessageId,
   onUpdate,
+  newMessageFocus,
 }) => {
+  const { currentUser } = useContext(AuthContext);
   const editInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleEditClick = (id: string, currentMessage: string) => {
@@ -39,31 +42,57 @@ export const MessageElement: React.FC<Props> = ({
       e.preventDefault();
 
       if (editedMessageId && editedMessage.trim()) {
-        onUpdate(editedMessageId, editedMessage);
+        onUpdate();
       }
     }
   };
 
+  const handleEditBlur = () => {
+    setEditedMessageId(null);
+    newMessageFocus();
+  };
+
+  React.useEffect(() => {
+    if (editedMessageId === message.id) {
+      editInputRef.current?.focus();
+    }
+  }, [editedMessageId]);
+
   return (
     <div
       data-cy="Todo"
-      className={classNames('todo', {
+      className={classNames('todo todo-message', {
         completed: message.createdAt !== message.updatedAt,
+        'message--mine': currentUser?.id === message.userId,
       })}
     >
-      <label className="todo__status-label">
-        <button
-          type="button"
-          className="message__edit fa-sm"
-          onClick={() => handleEditClick(message.id, message.message)}
-        >
-          <i className="fas fa-pen " />
-        </button>
-      </label>
+      <div className="message__header">
+        <strong>{message.username ? message.username : 'deleted user'}</strong>
 
+        <span className="message__date">
+          {new Date(
+            message.createdAt !== message.updatedAt
+              ? message.updatedAt
+              : message.createdAt,
+          ).toLocaleString()}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        className="message__edit"
+        onClick={() => handleEditClick(message.id, message.message)}
+      >
+        <i className="fas fa-pen message__edit--icon" />
+      </button>
       {editedMessageId !== message.id ? (
         <>
           <span className="todo__title">{message.message}</span>
+
+          {message.createdAt !== message.updatedAt && (
+            <span className="message__edited">edited</span>
+          )}
+
           <button
             type="button"
             className="todo__remove"
@@ -84,11 +113,11 @@ export const MessageElement: React.FC<Props> = ({
             }}
             value={editedMessage}
             onKeyDown={(e) => handleEditKeyPress(e)}
+            onBlur={handleEditBlur}
           />
         </form>
       )}
 
-      {/* overlay will cover the todo while it is being deleted or updated */}
       <div
         data-cy="TodoLoader"
         className={classNames('modal overlay', {

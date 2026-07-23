@@ -1,12 +1,9 @@
-import classNames from 'classnames';
-import { Message } from '../../types/Message';
-import { useRef } from 'react';
-
 interface Props {
   newMessage: string;
   onMessageSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onMessageChange: (newTitle: string) => void;
   loading: boolean;
+  messageInputRef: React.RefObject<HTMLTextAreaElement>;
 }
 
 export const NewMessage: React.FC<Props> = ({
@@ -14,20 +11,14 @@ export const NewMessage: React.FC<Props> = ({
   onMessageSubmit,
   onMessageChange,
   loading,
+  messageInputRef,
 }) => {
-  const messageInput = useRef<HTMLTextAreaElement>(null);
-
-  const handleSubmitClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    messageInput.current?.form?.requestSubmit();
-  };
-
   return (
     <header className="todoapp__header-container">
       <div className="todoapp__header">
         <form onSubmit={onMessageSubmit}>
           <textarea
-            ref={messageInput}
+            ref={messageInputRef}
             data-cy="NewTodoField"
             className="todoapp__new-todo"
             placeholder="Message"
