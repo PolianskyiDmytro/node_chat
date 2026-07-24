@@ -21,6 +21,9 @@ const services = {
       },
     });
   },
+  delete: (userId) => {
+    Token.destroy({ where: { userId } });
+  },
 };
 
 module.exports = {

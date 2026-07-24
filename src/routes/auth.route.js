@@ -11,6 +11,7 @@ router.post('/register', catchError(authController.register));
 router.get('/activate/:activationToken', catchError(authController.activate));
 router.post('/login', authMiddleware, catchError(authController.login));
 router.get('/refresh', catchError(authController.refresh));
+router.post('logout', authController.logout);
 
 module.exports = {
   router,

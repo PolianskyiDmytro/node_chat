@@ -122,6 +122,18 @@ const controller = {
 
     generateTokens(res, user);
   },
+  logout: async (req, res) => {
+    const { refreshToken } = req.cookies;
+    const userData = jwtServices.verifyRefresh(refreshToken);
+
+    if (!userData || !refreshToken) {
+      throw ApiError.unauthorized();
+    }
+
+    await tokenServices.delete(userData.id);
+
+    res.sendStatus(204);
+  },
 };
 
 module.exports = {
