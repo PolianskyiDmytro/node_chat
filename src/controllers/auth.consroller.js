@@ -89,7 +89,7 @@ const controller = {
     user.activationToken = null;
     user.save();
 
-    res.send(user);
+    res.send({ user, activationToken });
   },
   login: async (req, res) => {
     const { email, password } = req.body;
