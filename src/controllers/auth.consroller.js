@@ -36,7 +36,7 @@ const generateTokens = async (res, user) => {
 
   await tokenServices.save(normalizedUser.id, refreshToken);
 
-  res.cookies('refreshToken', refreshToken, {
+  res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 3600 + 1000,
     HttpOnly: true,
   });
@@ -89,7 +89,7 @@ const controller = {
     user.activationToken = null;
     user.save();
 
-    res.send({ user, activationToken });
+    generateTokens(res, user);
   },
   login: async (req, res) => {
     const { email, password } = req.body;

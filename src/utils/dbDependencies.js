@@ -12,5 +12,7 @@ Message.belongsTo(Room, {
   foreignKey: 'roomId',
 });
 
-Token.belongsTo(User);
+Token.belongsTo(User, {
+  foreignKey: 'userId',
+});
 User.hasOne(Token);
