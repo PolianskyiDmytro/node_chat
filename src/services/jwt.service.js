@@ -13,6 +13,18 @@ const services = {
       return null;
     }
   },
+  signRefresh: (user) => {
+    const token = jwt.sign(user, process.env.JWT_REFRESH_KEY);
+
+    return token;
+  },
+  verifyRefresh: (token) => {
+    try {
+      return jwt.verify(token, process.env.JWT_REFRESH_KEY);
+    } catch (err) {
+      return null;
+    }
+  },
 };
 
 module.exports = {

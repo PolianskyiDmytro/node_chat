@@ -1,6 +1,6 @@
 import { createClient } from './index.js';
-import { authService } from '../services/authService.js';
-import { accessTokenService } from '../services/accessTokenService.js';
+import { authService } from '../api/auth.ts';
+import { accessTokenService } from '../api/accessToken.ts';
 
 export const httpClient = createClient();
 

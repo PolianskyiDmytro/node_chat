@@ -1,8 +1,9 @@
 class ApiError extends Error {
-  constructor({ message, errorStatus, errors = [] }) {
+  // eslint-disable-next-line no-shadow
+  constructor({ message, status, errors = [] }) {
     super(message);
 
-    this.status = errorStatus;
+    this.status = status;
     this.errors = errors;
   }
 

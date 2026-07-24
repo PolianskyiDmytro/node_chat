@@ -9,6 +9,7 @@ const { router: roomsRouter } = require('./routes/rooms.route');
 const { router: authRouter } = require('./routes/auth.route');
 const { authMiddleware } = require('./middlewares/auth.middleware');
 const { errorMiddleware } = require('./middlewares/error.middleware');
+const cookieparser = require('cookie-parser');
 // const path = require('path');
 // const fs = require('fs');
 
@@ -23,6 +24,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use(cookieparser());
 app.use(authRouter);
 app.use('/messages', authMiddleware, messageRouter);
 app.use('/users', authMiddleware, userRouter);
