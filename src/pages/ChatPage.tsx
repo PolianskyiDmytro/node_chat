@@ -70,13 +70,13 @@ export const ChatPage: React.FC = () => {
   const handleNewMessageSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!newMessage.trim() || !pickedRoomId) {
+    if (!newMessage.trim() || !pickedRoomId || !currentUser) {
       return;
     }
 
     setLoading(true);
 
-    addMessage(newMessage, pickedRoomId)
+    addMessage(newMessage, pickedRoomId, currentUser.id)
       .then((message) => {
         setRoomMessages((prevMessages) => [...prevMessages, message]);
         setNewMessage('');
@@ -169,11 +169,11 @@ export const ChatPage: React.FC = () => {
     if (e.key === 'Enter') {
       e.preventDefault();
 
-      if (!newRoomName) {
+      if (!newRoomName || !currentUser) {
         return;
       }
 
-      addRoom(newRoomName)
+      addRoom(newRoomName, currentUser.id)
         .then((room) => {
           setRooms((prevRooms) => [...prevRooms, room]);
           setNewRoom(false);

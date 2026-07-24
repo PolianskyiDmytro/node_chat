@@ -11,6 +11,10 @@ export const AccountActivationPage = () => {
   const { activate } = useContext(AuthContext);
   const { activationToken } = useParams();
 
+  if (!activationToken) {
+    return;
+  }
+
   useEffect(() => {
     activate(activationToken)
       .catch((err) => {

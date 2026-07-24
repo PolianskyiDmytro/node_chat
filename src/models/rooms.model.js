@@ -17,6 +17,7 @@ const Room = sequelize.define(
     userId: {
       type: DataTypes.UUID,
       foreignKey: true,
+      allowNull: false,
     },
   },
   {

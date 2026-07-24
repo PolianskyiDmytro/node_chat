@@ -9,10 +9,11 @@ export const getMessageById = (id: string) => {
   return client.get<Message>(`/messages/${id}`);
 };
 
-export const addMessage = (message: string, roomId: string) => {
+export const addMessage = (message: string, roomId: string, userId: string) => {
   return client.post<Message>('/messages', {
     message,
     roomId,
+    userId,
   });
 };
 

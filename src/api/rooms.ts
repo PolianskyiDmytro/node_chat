@@ -9,9 +9,10 @@ export const getRoomById = (id: string) => {
   return client.get<Room>(`/rooms/${id}`);
 };
 
-export const addRoom = (roomName: string) => {
+export const addRoom = (roomName: string, userId: string) => {
   return client.post<Room>('/rooms', {
     roomName,
+    userId,
   });
 };
 

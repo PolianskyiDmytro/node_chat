@@ -14,10 +14,12 @@ const Message = sequelize.define(
     roomId: {
       type: DataTypes.UUID,
       foreignKey: true,
+      allowNull: false,
     },
     userId: {
       type: DataTypes.UUID,
       foreignKey: true,
+      allowNull: false,
     },
     message: {
       type: DataTypes.STRING,
@@ -75,7 +77,7 @@ const services = {
       include: [
         {
           model: User,
-          attributes: ['id', 'username'],
+          attributes: ['username'],
         },
       ],
     });
