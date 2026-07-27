@@ -1,17 +1,15 @@
 {
-  "name": "node_chat",
+  "name": "node_auth-app",
   "version": "1.0.0",
-  "description": "Chat using Node.js",
+  "description": "Auth app",
   "main": "src/index.js",
   "scripts": {
     "init": "mate-scripts init",
-    "dev": "vite",
     "start": "node src/index.js",
     "lint": "npm run format && mate-scripts lint",
     "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
     "test:only": "mate-scripts test",
     "update": "mate-scripts update",
-    "postinstall": "npm run update",
     "test": "npm run lint && npm run test:only"
   },
   "author": "Mate academy",
@@ -62,6 +60,7 @@
     "react-transition-group": "^4.4.5",
     "sass": "^1.99.0",
     "sequelize": "^6.37.8",
-    "vite": "^6.4.3"
+    "vite": "^6.4.3",
+    "ws": "^8.21.1"
   }
 }

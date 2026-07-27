@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/db');
-const { ApiError } = require('../exceptions/api.error');
+const { UserRoom } = require('./userRooms.model');
+const { User } = require('./users.model');
 
 const Room = sequelize.define(
   'Room',
@@ -10,13 +11,14 @@ const Room = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
+
     roomName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     userId: {
       type: DataTypes.UUID,
-      foreignKey: true,
       allowNull: false,
     },
   },
@@ -28,35 +30,84 @@ const Room = sequelize.define(
 );
 
 const services = {
-  getAll: async () => {
-    const rooms = await Room.findAll();
-
-    return rooms;
+  getAll: async (userId) => {
+    return Room.findAll({
+      include: [
+        {
+          model: User,
+          as: 'subscribers',
+          where: { id: userId },
+          through: { attributes: [] },
+        },
+      ],
+    });
   },
+
   getById: async (id) => {
-    const room = await Room.findByPk(id);
-
-    if (!room) {
-      throw ApiError.notFound({ room: 'Not Found' });
-    }
-
-    return room;
+    return Room.findByPk(id);
   },
-  create: async (roomName) => {
-    const room = await Room.create(roomName);
 
-    return room;
+  search: async (roomName) => {
+    const { Op } = require('sequelize');
+
+    return Room.findAll({
+      where: {
+        roomName: {
+          [Op.like]: `%${roomName}%`,
+        },
+      },
+    });
   },
+
+  create: async (data) => {
+    return Room.create(data);
+  },
+
+  addUserRoom: async (userId, roomId) => {
+    return UserRoom.create({
+      userId,
+      roomId,
+    });
+  },
+
+  update: async (id, roomName) => {
+    await Room.update(
+      { roomName },
+      {
+        where: { id },
+      },
+    );
+
+    return Room.findByPk(id);
+  },
+
   delete: async (id) => {
     const room = await Room.findByPk(id);
 
-    await room.destroy();
+    if (!room) {
+      return null;
+    }
+
+    await Room.destroy({
+      where: {
+        id,
+      },
+    });
 
     return room;
   },
-  update: async (id, roomName) => {
-    await Room.update({ roomName }, { where: { id } });
+
+  removeUserRoom: async (userId, roomId) => {
+    return UserRoom.destroy({
+      where: {
+        userId,
+        roomId,
+      },
+    });
   },
 };
 
-module.exports = { services, Room };
+module.exports = {
+  Room,
+  services,
+};

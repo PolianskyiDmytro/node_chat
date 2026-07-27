@@ -21,8 +21,8 @@ const services = {
       },
     });
   },
-  delete: (userId) => {
-    Token.destroy({ where: { userId } });
+  delete: async (userId) => {
+    await Token.destroy({ where: { userId } });
   },
 };
 

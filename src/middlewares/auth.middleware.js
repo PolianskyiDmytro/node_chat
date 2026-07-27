@@ -1,10 +1,9 @@
 const { services: jwtServices } = require('../services/jwt.service');
 
 const authMiddleware = (req, res, next) => {
-  const header = req.headers['authorization'] || '';
-  const [, token] = header.split(' ');
+  const token = req.cookies.accessToken;
 
-  if (!header || !token) {
+  if (!token) {
     res.sendStatus(401);
 
     return;
@@ -17,6 +16,8 @@ const authMiddleware = (req, res, next) => {
 
     return;
   }
+
+  req.user = userData;
 
   next();
 };

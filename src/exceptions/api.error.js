@@ -23,6 +23,14 @@ class ApiError extends Error {
     });
   }
 
+  static forbidden(errors) {
+    return new ApiError({
+      message: 'Forbidden',
+      errors,
+      status: 403,
+    });
+  }
+
   static notFound(errors) {
     return new ApiError({
       message: 'Not Found',

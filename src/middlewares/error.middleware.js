@@ -1,6 +1,9 @@
 const { ApiError } = require('../exceptions/api.error');
 
 const errorMiddleware = (error, req, res, next) => {
+  // eslint-disable-next-line no-console
+  console.error(error);
+
   if (error instanceof ApiError) {
     return res.status(error.status).json({
       message: error.message,

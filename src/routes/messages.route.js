@@ -3,6 +3,7 @@ const {
   controller: messageController,
 } = require('../controllers/messages.controller');
 const { catchError } = require('../utils/catchError');
+const { messageOwnerMiddleware } = require('../middlewares/owner.middleware');
 
 const router = express.Router();
 
@@ -12,9 +13,17 @@ router.get('/:id', catchError(messageController.getById));
 
 router.post('/', catchError(messageController.create));
 
-router.delete('/:id', catchError(messageController.delete));
+router.delete(
+  '/:id',
+  messageOwnerMiddleware,
+  catchError(messageController.delete),
+);
 
-router.patch('/:id', catchError(messageController.update));
+router.patch(
+  '/:id',
+  messageOwnerMiddleware,
+  catchError(messageController.update),
+);
 
 router.get('/room/:roomId', catchError(messageController.getAllByRoomId));
 

@@ -1,4 +1,5 @@
 const { services: messageService } = require('../models/messages.model');
+const { sendToRoom } = require('../websocket');
 
 const controller = {
   getAll: async (req, res) => {
@@ -14,10 +15,20 @@ const controller = {
   create: async (req, res) => {
     const message = await messageService.create(req.body);
 
+    sendToRoom(message.roomId, {
+      type: 'addMessage',
+      payload: message,
+    });
+
     res.send(message);
   },
   delete: async (req, res) => {
     const message = await messageService.delete(req.params.id);
+
+    sendToRoom(message.roomId, {
+      type: 'deleteMessage',
+      payload: message,
+    });
 
     res.send(message);
   },
@@ -29,12 +40,17 @@ const controller = {
 
     const updatedMessage = await messageService.getById(id);
 
+    sendToRoom(updatedMessage.roomId, {
+      type: 'updateMessage',
+      payload: updatedMessage,
+    });
+
     res.send(updatedMessage);
   },
   getAllByRoomId: async (req, res) => {
-    const roomMessages = await messageService.getAllByRoomId(req.params.roomId);
+    const messages = await messageService.getAllByRoomId(req.params.roomId);
 
-    res.send(roomMessages);
+    res.send(messages);
   },
 };
 

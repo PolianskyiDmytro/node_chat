@@ -21,9 +21,17 @@ const Message = sequelize.define(
       foreignKey: true,
       allowNull: false,
     },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     message: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    edited: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -59,6 +67,10 @@ const services = {
   create: async (messageData) => {
     const message = await Message.create(messageData);
 
+    if (!message) {
+      throw ApiError.badRequest({ message: 'was not created' });
+    }
+
     return message;
   },
   delete: async (id) => {
@@ -69,7 +81,7 @@ const services = {
     return message;
   },
   update: async (id, message) => {
-    await Message.update({ message }, { where: { id } });
+    await Message.update({ message, edited: true }, { where: { id } });
   },
   getAllByRoomId: async (roomId) => {
     const roomMessages = await Message.findAll({
@@ -77,6 +89,7 @@ const services = {
       include: [
         {
           model: User,
+          as: 'user',
           attributes: ['username'],
         },
       ],
